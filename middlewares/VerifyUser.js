@@ -16,6 +16,7 @@ export const verifyUser = async (req, res, next) => {
           id: user.id,
           name: user.name,
           email: user.email,
+          phone: user.phone,
         };
         next();
       } else {

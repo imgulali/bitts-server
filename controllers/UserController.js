@@ -20,13 +20,14 @@ export const RegisterUser = async (req, res, next) => {
       password: hashedPassword,
     });
 
-    const { id } = user;
+    const { id, phone } = user;
     const authToken = await generateAuthToken(id);
 
     res.success("User Registered Successfully", {
       authToken,
       name,
       email,
+      phone,
     });
   } catch (error) {
     next(error);
@@ -55,9 +56,9 @@ export const LoginUser = async (req, res, next) => {
       );
     }
 
-    const { id, name } = user;
+    const { id, name, phone } = user;
     const authToken = await generateAuthToken(id);
-    res.success("Logged in Successful", { authToken, name, email });
+    res.success("Logged in Successful", { authToken, name, email, phone });
   } catch (error) {
     next(error);
   }
@@ -65,8 +66,8 @@ export const LoginUser = async (req, res, next) => {
 
 export const FetchUser = async (req, res, next) => {
   try {
-    const { name, email } = req.user;
-    res.success("User Fetched Successfully", { name, email });
+    const { name, email, phone } = req.user;
+    res.success("User Fetched Successfully", { name, email, phone });
   } catch (error) {
     next(error);
   }
@@ -75,14 +76,17 @@ export const FetchUser = async (req, res, next) => {
 export const UpdateUser = async (req, res, next) => {
   try {
     const { id } = req.user;
-    const { name, email, password } = req.body;
+    const { name, email, phone, password } = req.body;
     let updatedUser = {};
 
     if (name) updatedUser.name = name;
     if (email) {
-
-      if(email == req.user.email){
-        return res.error("Validation Error", "New email cannot be same as the old one", 401);
+      if (email == req.user.email) {
+        return res.error(
+          "Validation Error",
+          "New email cannot be same as the old one",
+          401
+        );
       }
 
       const user = await User.findOne({ email });
@@ -92,6 +96,7 @@ export const UpdateUser = async (req, res, next) => {
 
       updatedUser.email = email;
     }
+    if (phone) updatedUser.phone = phone;
     if (password) {
       updatedUser.password = await hashPassword(password);
     }
@@ -101,7 +106,7 @@ export const UpdateUser = async (req, res, next) => {
       { $set: updatedUser },
       { new: true }
     );
-    res.success("Updated User Successfully", { name, email });
+    res.success("Updated User Successfully", { name, email, phone });
   } catch (error) {
     next(error);
   }

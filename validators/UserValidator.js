@@ -1,4 +1,5 @@
 import joi from "joi";
+import { cleanPhoneNumber } from "../utils/UserUtils.js";
 
 export const RegisterUserSchema = joi.object({
   name: joi.string().required().empty().messages({
@@ -33,17 +34,28 @@ export const LoginUserSchema = joi.object({
 
 export const UpdateUserSchema = joi.object({
   name: joi.string().messages({
-    "any.required": "Name is required",
-    "string.empty": "Name is required",
+    "string.empty": "Name can not be empty",
   }),
 
   email: joi.string().email().messages({
-    "any.required": "Email is required",
+    "string.empty": "Email can not be empty",
     "string.email": "Invalid email format",
   }),
-
+  phone: joi
+    .string()
+    .custom((value, helpers) => {
+      const cleanedPhoneNumber = cleanPhoneNumber(value);
+      if (!/^(92|\\+92)?[0-9]{10}$/.test(cleanedPhoneNumber)) {
+        return helpers.error("string.pattern.base");
+      }
+      return cleanedPhoneNumber;
+    })
+    .messages({
+      "string.empty": "Phone number can not be empty",
+      "string.pattern.base": "Invalid phone number format",
+    }),
   password: joi.string().min(6).messages({
-    "any.required": "Password is required",
+    "string.empty": "Password can not be empty",
     "string.min": "Password should be atleast of 6 chars",
   }),
 });

@@ -12,6 +12,9 @@ export const validate = (schema) => {
           .join(", ");
         return res.error("Validation Error", error, 400);
       }
+      if(result.value.phone){
+        req.body.phone = result.value.phone;
+      }
       next();
     } catch (error) {
       next(error);

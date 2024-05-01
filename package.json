@@ -1,6 +1,6 @@
 {
   "name": "bitts-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Backend for Bitts app",
   "type": "module",
   "main": "app.js",
